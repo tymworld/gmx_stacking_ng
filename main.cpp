@@ -1,6 +1,9 @@
 #include <iostream>
+#include "stacking.h"
 
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+int main(int argc, char * argv[]) {
+    // insert code here...
+    return gmx::TrajectoryAnalysisCommandLineRunner::runAsMain<stacking>(argc, argv);
+
 }
+

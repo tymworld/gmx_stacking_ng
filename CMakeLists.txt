@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.8)
 
-project(gmx_stacking_fast CXX)
+project(gmx_stacking.ng CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
@@ -38,7 +38,7 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set(CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG} CACHE STRING "" FORCE)
 endif()
 
-add_executable(gmx_stacking_fast main.cpp stacking.cpp)
-set_target_properties(gmx_stacking_fast PROPERTIES
+add_executable(gmx_stacking.ng main.cpp stacking.cpp)
+set_target_properties(gmx_stacking.ng PROPERTIES
         COMPILE_FLAGS "${GROMACS_CXX_FLAGS}")
-target_link_libraries(gmx_stacking ${GROMACS_LIBRARIES})
+target_link_libraries(gmx_stacking.ng ${GROMACS_LIBRARIES})
