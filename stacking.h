@@ -74,6 +74,7 @@ private:
     // Vice versa, if the ring_number_in_molecule_ is specified, the inter_molecule_ must be true.
 
     bool            inter_molecule_;
+    bool            intra_molecule_;
     int             ring_number_in_molecule_;
 
     t_topology     *top_;

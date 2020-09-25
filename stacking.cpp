@@ -110,6 +110,9 @@ void stacking::initOptions(IOptionsContainer *options, TrajectoryAnalysisSetting
     options->addOption(BooleanOption("inter_molecule").store(&inter_molecule_).defaultValue(false)
                        .description("Whether only contact between different molecule is calculated. MUST SPECIFY num_ring!!!"));
 
+    options->addOption(BooleanOption("intra_molecule").store(&intra_molecule_).defaultValue(false)
+                               .description("Whether only contact between the same molecule is calculated. MUST SPECIFY num_ring!!!"));
+
     options->addOption(IntegerOption("num_ring").store(&ring_number_in_molecule_).defaultValue(1)
                        .description("Number of rings in each molecule. Specify this without enabling inter_molecule is useless."));
 
@@ -147,9 +150,9 @@ void stacking::initAnalysis(const TrajectoryAnalysisSettings &settings, const To
     data_probability_.setDataSetCount(1);
     data_probability_.setColumnCount(0,1);
 
-    if(not inter_molecule_ and ring_number_in_molecule_ > 1)
+    if((not inter_molecule_ and not intra_molecule_) and ring_number_in_molecule_ > 1)
     {
-        cerr << "ERROR: Specify num_ring without -inter_molecule_" << endl;
+        cerr << "ERROR: Specify num_ring without -inter_molecule or -intra_molecule" << endl;
         exit(1);
     }
 
@@ -169,9 +172,9 @@ void stacking::initAnalysis(const TrajectoryAnalysisSettings &settings, const To
         }
     }
 
-    if(inter_molecule_ and not identical_selection)
+    if((inter_molecule_ or intra_molecule_) and not identical_selection)
     {
-        cerr << "Do not use -inter_molecule_ if the two selections ref_ and sel_ are different. " << endl;
+        cerr << "Do not use -inter/intra_molecule if the two selections ref_ and sel_ are different. " << endl;
         cerr << "This will produce artificial results." << endl;
         cerr << "The program will now end." << endl;
         exit(1);
@@ -182,6 +185,16 @@ void stacking::initAnalysis(const TrajectoryAnalysisSettings &settings, const To
         cout << "*****************************************" << endl;
         cout << "**        VERY IMPORTANT NOTICE        **" << endl;
         cout << "** You have specified -inter-molecule_ **" << endl;
+        cout << "** You should also specify -num_ring   **" << endl;
+        cout << "** Now a molecule contains " << setw(3) << ring_number_in_molecule_ << " rings!! **" << endl;
+        cout << "*****************************************" << endl;
+    }
+
+    if(intra_molecule_)
+    {
+        cout << "*****************************************" << endl;
+        cout << "**        VERY IMPORTANT NOTICE        **" << endl;
+        cout << "** You have specified -intra-molecule_ **" << endl;
         cout << "** You should also specify -num_ring   **" << endl;
         cout << "** Now a molecule contains " << setw(3) << ring_number_in_molecule_ << " rings!! **" << endl;
         cout << "*****************************************" << endl;
@@ -236,6 +249,11 @@ void stacking::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajecto
         for(int ring_index_in_sel = 0; ring_index_in_sel < sel_.atomCount() / 3; ring_index_in_sel++)
         {
             if(inter_molecule_ and ring_index_in_ref % ring_number_in_molecule_ == ring_index_in_sel % ring_number_in_molecule_)
+            {
+                continue;
+            }
+
+            if(intra_molecule_ and ring_index_in_ref % ring_number_in_molecule_ != ring_index_in_sel % ring_number_in_molecule_)
             {
                 continue;
             }
