@@ -248,12 +248,16 @@ void stacking::analyzeFrame(int frnr, const t_trxframe &fr, t_pbc *pbc, Trajecto
     {
         for(int ring_index_in_sel = 0; ring_index_in_sel < sel_.atomCount() / 3; ring_index_in_sel++)
         {
-            if(inter_molecule_ and ring_index_in_ref % ring_number_in_molecule_ == ring_index_in_sel % ring_number_in_molecule_)
+            if(inter_molecule_
+            and floor(ring_index_in_ref / float(ring_number_in_molecule_))
+             == floor(ring_index_in_sel / float(ring_number_in_molecule_)))
             {
                 continue;
             }
 
-            if(intra_molecule_ and ring_index_in_ref % ring_number_in_molecule_ != ring_index_in_sel % ring_number_in_molecule_)
+            if(intra_molecule_
+               and floor(ring_index_in_ref / float(ring_number_in_molecule_))
+                   != floor(ring_index_in_sel / float(ring_number_in_molecule_)))
             {
                 continue;
             }
