@@ -7,8 +7,11 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
-#include <gromacs/fileio/matio.h>
-#include <gromacs/fileio/gmxfio.h>
+#include <gromacs/fileio/filetypes.h>
+#include "gromacs/trajectoryanalysis/topologyinformation.h"
+
+//#include <gromacs/fileio/matio.h>
+//#include <gromacs/fileio/gmxfio.h>
 
 float stacking::calDistance(const coordinate atom11, const coordinate atom12, const coordinate atom13,
                             const coordinate atom21, const coordinate atom22, const coordinate atom23)
@@ -71,15 +74,15 @@ void stacking::initOptions(IOptionsContainer *options, TrajectoryAnalysisSetting
 
     settings->setHelpText(desc);
 
-    options->addOption(FileNameOption("energy").filetype(eftUnknown).legacyType(efXPM).outputFile()
-                               .store(&fnEnergySurface_).defaultBasename("energy")
-                               .description("Energy Surface xpm map").required());
+    //options->addOption(FileNameOption("energy").filetype(OptionFileType::GenericData).legacyType(efXPM).outputFile()
+    //                           .store(&fnEnergySurface_).defaultBasename("energy")
+    //                           .description("Energy Surface xpm map").required());
 
-    options->addOption(FileNameOption("raw-energy").filetype(eftGenericData).outputFile()
+    options->addOption(FileNameOption("raw-energy").filetype(OptionFileType::GenericData).outputFile()
                                .store(&fnEnergySurfaceRaw_)
                                .description("Ras Energy Surface Data for further analysis"));
 
-    options->addOption(FileNameOption("raw-probability").filetype(eftGenericData).outputFile()
+    options->addOption(FileNameOption("raw-probability").filetype(OptionFileType::GenericData).outputFile()
                                .store(&fnPropability_)
                                .description("Raw Probability Data for further analysis"));
 
@@ -116,9 +119,10 @@ void stacking::initOptions(IOptionsContainer *options, TrajectoryAnalysisSetting
     options->addOption(IntegerOption("num_ring").store(&ring_number_in_molecule_).defaultValue(1)
                        .description("Number of rings in each molecule. Specify this without enabling inter_molecule is useless."));
 
+    settings->setFlag(TrajectoryAnalysisSettings::efRequireTop);
 }
 
-void stacking::initAnalysis(const TrajectoryAnalysisSettings &settings, const TopologyInformation &top)
+void stacking::initAnalysis(const gmx::TrajectoryAnalysisSettings &settings, const gmx::TopologyInformation &top)
 {
 
     probability_ = new unsigned long*[(int)(maxDistance_ / stepDistance_)];
@@ -200,10 +204,12 @@ void stacking::initAnalysis(const TrajectoryAnalysisSettings &settings, const To
         cout << "*****************************************" << endl;
     }
 
-    top_   = top.topology();
-    atoms_ = top.topology()->atoms;
+
 
     nb_.setCutoff(cutoff_);
+
+    //top_   = top.topology();
+    atoms_ = top.atoms();
 
 }
 
@@ -314,9 +320,12 @@ void stacking::writeOutput()
     }
 
 
+    /*
     if       (fnEnergySurface_.empty())         {fnEnergySurface_ = "energy.xpm";}
     else if  (fnEnergySurface_.compare(".xpm")) {}
     else                                        {fnEnergySurface_ += ".xpm";}
+
+    */
 
     // Construct matrix probability
     real **matProbability = new real*[(int)(maxDistance_ / stepDistance_)];
@@ -344,6 +353,8 @@ void stacking::writeOutput()
         }
     }
 
+    /*
+
     t_rgb rlo, rhi;
     rlo.r = 0.0; rlo.g = 0.0; rlo.b = 1.0;
     rhi.r = 1.0; rhi.g = 0.0; rhi.b = 0.0;
@@ -360,6 +371,7 @@ void stacking::writeOutput()
             , matEnergy, 0, 20, rlo, rhi, &nlevels);
 
     fclose(fpEnergySurface);
+    */
 
     if (!fnEnergySurfaceRaw_.empty())
     {

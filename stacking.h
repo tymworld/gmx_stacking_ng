@@ -77,8 +77,8 @@ private:
     bool            intra_molecule_;
     int             ring_number_in_molecule_;
 
-    t_topology     *top_;
-    t_atoms         atoms_;
+    //t_topology     *top_;
+    const t_atoms         *atoms_;
 
     bool **ring_has_contact_;
 
